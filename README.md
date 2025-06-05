@@ -1,4 +1,4 @@
-LinkedIn Career Intelligence Agent
+##LinkedIn Career Intelligence Agent
 
 AI-powered career advisory system that analyzes LinkedIn profiles and provides personalized career guidance using GPT-4.
 🚀 Features
