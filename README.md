@@ -76,7 +76,8 @@ flask db upgrade
 redis-server                                    # Terminal 1
 celery -A app.celery worker --loglevel=info    # Terminal 2  
 python app.py                                  # Terminal 3
-
+---
+```bash 
 
 
 ### Agentic Flow
