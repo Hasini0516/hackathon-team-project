@@ -193,7 +193,6 @@ app.put('/user/linkedin', authenticate, async (req, res) => {
   return res.status(200).json({ msg: 'LinkedIn URL updated' });
 });
 
-// --- 404 Handler & Error Middleware ---
 app.use((req, res) => {
   res.status(404).json({ msg: 'Endpoint not found' });
 });
