@@ -1,6 +1,8 @@
 const { getLinkedInClient } = require('../api');
 const User = require('../models/User');
 const Conversation = require('../models/Conversation');
+const CareerIntelligence = require('../models/CareerIntelligence');
+const MarketData = require('../models/MarketData');
 
 class CareerIntelligenceService {
     constructor() {
@@ -226,6 +228,91 @@ class CareerIntelligenceService {
         } catch (error) {
             throw new Error(`Morning briefing error: ${error.message}`);
         }
+    }
+
+    async createCareerProfile(userId, profileData) {
+        const careerProfile = new CareerIntelligence({
+            userId,
+            ...profileData
+        });
+        await careerProfile.save();
+        return careerProfile;
+    }
+
+    async getCareerProfile(userId) {
+        const profile = await CareerIntelligence.findOne({ userId });
+        if (!profile) {
+            throw new Error('Career profile not found');
+        }
+        return profile;
+    }
+
+    async updateCareerProfile(userId, updateData) {
+        const profile = await CareerIntelligence.findOneAndUpdate(
+            { userId },
+            { $set: updateData },
+            { new: true }
+        );
+        if (!profile) {
+            throw new Error('Career profile not found');
+        }
+        return profile;
+    }
+
+    async getCareerRecommendations(userId) {
+        const profile = await this.getCareerProfile(userId);
+        const marketData = await MarketData.findOne({
+            industry: profile.industry,
+            jobTitle: profile.jobTitle
+        });
+
+        if (!marketData) {
+            throw new Error('Market data not found for this career path');
+        }
+
+        return {
+            profile,
+            marketInsights: {
+                salaryRange: marketData.salaryData,
+                demandMetrics: marketData.demandMetrics,
+                skillsInDemand: marketData.skillsInDemand,
+                trends: marketData.trends
+            }
+        };
+    }
+
+    async analyzeCareerPath(userId, targetJobTitle) {
+        const currentProfile = await this.getCareerProfile(userId);
+        const targetMarketData = await MarketData.findOne({
+            jobTitle: targetJobTitle,
+            industry: currentProfile.industry
+        });
+
+        if (!targetMarketData) {
+            throw new Error('Target career path data not found');
+        }
+
+        return {
+            currentProfile,
+            targetPath: {
+                jobTitle: targetJobTitle,
+                marketData: targetMarketData,
+                skillGaps: this.calculateSkillGaps(
+                    currentProfile.skills,
+                    targetMarketData.skillsInDemand
+                )
+            }
+        };
+    }
+
+    calculateSkillGaps(currentSkills, requiredSkills) {
+        const currentSkillSet = new Set(currentSkills);
+        return requiredSkills
+            .filter(skill => !currentSkillSet.has(skill.skill))
+            .map(skill => ({
+                skill: skill.skill,
+                demandScore: skill.demandScore
+            }));
     }
 }
 

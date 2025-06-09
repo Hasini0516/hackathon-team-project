@@ -27,7 +27,7 @@ connectDB();
 // Routes
 app.post('/api/register', async (req, res) => {
     try {
-        const { email, password, linkedinUrl } = req.body;
+        const { email, password, name, linkedinUrl, careerGoals, skills } = req.body;
         
         // Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -36,7 +36,14 @@ app.post('/api/register', async (req, res) => {
         }
 
         // Create new user
-        const user = new User({ email, password, linkedinUrl });
+        const user = new User({
+            email,
+            password,
+            name,
+            linkedinUrl,
+            careerGoals,
+            skills
+        });
         await user.save();
         
         const token = jwt.sign({ userId: user._id }, config.jwtSecret);
@@ -72,15 +79,20 @@ app.use('/api/brand-building', auth);
 
 // --- 3. Trigger LinkedIn Scrape ---
 app.post('/scrape', auth, async (req, res) => {
-  console.log(`[SCRAPE] POST /scrape called by userId=${req.userId}`);
-  try {
-    const jobId = addScrapeJob(req.userId);
-    console.log(`[SCRAPE] Job enqueued: jobId=${jobId} for userId=${req.userId}`);
-    return res.status(202).json({ taskId: jobId });
-  } catch (err) {
-    console.error(`[SCRAPE] Error enqueueing job for userId=${req.userId}:`, err.stack || err);
-    return res.status(500).json({ msg: 'Failed to enqueue job', error: err.message });
-  }
+    console.log(`[SCRAPE] POST /scrape called by userId=${req.userId}`);
+    try {
+        const { linkedinUrl } = req.body;
+        if (!linkedinUrl) {
+            return res.status(400).json({ error: 'LinkedIn URL is required' });
+        }
+
+        const jobId = addScrapeJob(req.userId, linkedinUrl);
+        console.log(`[SCRAPE] Job enqueued: jobId=${jobId} for userId=${req.userId}`);
+        return res.status(202).json({ taskId: jobId });
+    } catch (err) {
+        console.error(`[SCRAPE] Error enqueueing job for userId=${req.userId}:`, err.stack || err);
+        return res.status(500).json({ error: 'Failed to enqueue job', message: err.message });
+    }
 });
 
 // 3a. Scrape Status
@@ -141,38 +153,50 @@ app.get('/advice/status/:taskId', auth, async (req, res) => {
 
 // post conversation
 app.post('/conversations', auth, async (req, res) => {
-  const { history, aiResponses } = req.body;
+    try {
+        const { history, aiResponses } = req.body;
 
-  if (!history || !aiResponses) {
-    return res.status(400).json({ msg: 'history and aiResponses are required' });
-  }
+        if (!history || !aiResponses) {
+            return res.status(400).json({ error: 'history and aiResponses are required' });
+        }
 
-  try {
-    const newConv = new Conversation({
-      userId: req.userId,
-      history,
-      aiResponses
-    });
+        const newConv = new Conversation({
+            userId: req.userId,
+            history,
+            aiResponses
+        });
 
-    await newConv.save();
+        await newConv.save();
+        console.log(`[CONVERSATION] Saved conversation for userId=${req.userId}`);
 
-    return res.status(201).json({ msg: 'Conversation saved', conversationId: newConv._id });
-  } catch (err) {
-    console.error('Error saving conversation:', err);
-    return res.status(500).json({ msg: 'Failed to save conversation' });
-  }
+        return res.status(201).json({
+            message: 'Conversation saved',
+            conversationId: newConv._id
+        });
+    } catch (err) {
+        console.error('[CONVERSATION] Error saving conversation:', err);
+        return res.status(500).json({ error: 'Failed to save conversation' });
+    }
 });
 
 // --- 5. Get Conversations ---
 app.get('/conversations', auth, async (req, res) => {
-  const convs = await Conversation.find({ userId: req.userId }).sort({ updatedAt: -1 });
-  const output = convs.map((c) => ({
-    id: c._id,
-    history: c.history,
-    aiResponses: c.aiResponses,
-    lastUpdated: c.updatedAt
-  }));
-  return res.status(200).json(output);
+    try {
+        const conversations = await Conversation.find({ userId: req.userId })
+            .sort({ updatedAt: -1 });
+
+        console.log(`[CONVERSATION] Retrieved ${conversations.length} conversations for userId=${req.userId}`);
+
+        return res.status(200).json(conversations.map(conv => ({
+            id: conv._id,
+            history: conv.history,
+            aiResponses: conv.aiResponses,
+            lastUpdated: conv.updatedAt
+        })));
+    } catch (err) {
+        console.error('[CONVERSATION] Error retrieving conversations:', err);
+        return res.status(500).json({ error: 'Failed to retrieve conversations' });
+    }
 });
 
 // --- 6. Update LinkedIn URL ---
