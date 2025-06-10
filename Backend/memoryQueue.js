@@ -89,10 +89,10 @@ async function scrapeWorker() {
   }
 }
 
-// Start the worker (immediately)
-scrapeWorker().catch(err => {
-  console.error('[WORKER] Scrape worker crashed:', err);
-});
+// Start the worker (immediately) - Temporarily commented out for debugging
+// scrapeWorker().catch(err => {
+//   console.error('[WORKER] Scrape worker crashed:', err);
+// });
 
 //
 // Add a new job to the queue. Returns a jobId string.

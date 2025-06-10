@@ -1,14 +1,15 @@
+console.log('index.js: Script started.');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./utils/db');
 const config = require('./config');
 const auth = require('./middleware/auth');
-const { getLinkedInClient } = require('./api');
+const { getLinkedInClient, handleChatRequest, handleLinkedInProfileRequest } = require('./api');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const adviceQueue  = require('./adviceQueue');
+const adviceQueue = require('./adviceQueue');
 const User = require('./models/User');
 const Conversation = require('./models/Conversation');
 const { addScrapeJob, getJobStatus } = require('./memoryQueue');
@@ -24,18 +25,20 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
-// Routes
-app.post('/api/register', async (req, res) => {
+// --- API Router ---
+const apiRouter = express.Router();
+console.log('index.js: apiRouter created.');
+
+// Unprotected routes
+apiRouter.post('/register', async (req, res) => {
     try {
         const { email, password, name, linkedinUrl, careerGoals, skills } = req.body;
         
-        // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ error: 'Email already registered' });
         }
 
-        // Create new user
         const user = new User({
             email,
             password,
@@ -54,7 +57,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-app.post('/api/login', async (req, res) => {
+apiRouter.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
@@ -70,15 +73,21 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// Temporary test endpoint
+apiRouter.get('/test', (req, res) => {
+  console.log('apiRouter: /test endpoint hit.');
+  res.json({ message: 'Test endpoint reached successfully!' });
+});
+
+// Apply auth middleware to all routes below this line in apiRouter
+apiRouter.use(auth);
+
 // Protected routes
-app.use('/api/career-strategist', auth);
-app.use('/api/career-pathways', auth);
-app.use('/api/network-strategy', auth);
-app.use('/api/market-intelligence', auth);
-app.use('/api/brand-building', auth);
+apiRouter.post('/chat', handleChatRequest);
+apiRouter.post('/linkedin/profile', handleLinkedInProfileRequest);
 
 // --- 3. Trigger LinkedIn Scrape ---
-app.post('/scrape', auth, async (req, res) => {
+apiRouter.post('/scrape', async (req, res) => {
     console.log(`[SCRAPE] POST /scrape called by userId=${req.userId}`);
     try {
         const { linkedinUrl } = req.body;
@@ -96,7 +105,7 @@ app.post('/scrape', auth, async (req, res) => {
 });
 
 // 3a. Scrape Status
-app.get('/scrape/status/:taskId', auth, async (req, res) => {
+apiRouter.get('/scrape/status/:taskId', async (req, res) => {
   const { taskId } = req.params;
   const statusObj = getJobStatus(taskId);
 
@@ -118,7 +127,7 @@ app.get('/scrape/status/:taskId', auth, async (req, res) => {
 });
 
 // --- 4. Ask for Career Advice (Stub) ---
-app.post('/advice', auth, async (req, res) => {
+apiRouter.post('/advice', async (req, res) => {
   try {
     const { question } = req.body;
     if (!question) return res.status(400).json({ msg: 'Question required' });
@@ -132,7 +141,7 @@ app.post('/advice', auth, async (req, res) => {
 });
 
 // 4a. Advice Status
-app.get('/advice/status/:taskId', auth, async (req, res) => {
+apiRouter.get('/advice/status/:taskId', async (req, res) => {
   const { taskId } = req.params;
   const statusObj = adviceQueue.getStatus(taskId);
 
@@ -152,7 +161,7 @@ app.get('/advice/status/:taskId', auth, async (req, res) => {
 });
 
 // post conversation
-app.post('/conversations', auth, async (req, res) => {
+apiRouter.post('/conversations', async (req, res) => {
     try {
         const { history, aiResponses } = req.body;
 
@@ -180,7 +189,7 @@ app.post('/conversations', auth, async (req, res) => {
 });
 
 // --- 5. Get Conversations ---
-app.get('/conversations', auth, async (req, res) => {
+apiRouter.get('/conversations', async (req, res) => {
     try {
         const conversations = await Conversation.find({ userId: req.userId })
             .sort({ updatedAt: -1 });
@@ -200,7 +209,7 @@ app.get('/conversations', auth, async (req, res) => {
 });
 
 // --- 6. Update LinkedIn URL ---
-app.put('/user/linkedin', auth, async (req, res) => {
+apiRouter.put('/user/linkedin', async (req, res) => {
   const { linkedinUrl } = req.body;
   if (!linkedinUrl) return res.status(400).json({ msg: 'linkedinUrl required' });
 
@@ -211,7 +220,7 @@ app.put('/user/linkedin', auth, async (req, res) => {
 // --- New API Endpoints for Career Intelligence Agent ---
 
 // 7. Conversational Career Strategist
-app.post('/api/career-strategist', auth, async (req, res) => {
+apiRouter.post('/career-strategist', async (req, res) => {
     try {
         const { message, conversationHistory } = req.body;
         if (!message) return res.status(400).json({ msg: 'Message required' });
@@ -230,7 +239,7 @@ app.post('/api/career-strategist', auth, async (req, res) => {
 });
 
 // 8. Predictive Career Pathway Intelligence
-app.get('/api/career-pathways', auth, async (req, res) => {
+apiRouter.get('/career-pathways', async (req, res) => {
     try {
         const pathways = await careerIntelligenceService.getCareerPathways(req.userId);
         return res.status(200).json(pathways);
@@ -241,7 +250,7 @@ app.get('/api/career-pathways', auth, async (req, res) => {
 });
 
 // 9. Active Network Strategy Engine
-app.post('/api/network-strategy', auth, async (req, res) => {
+apiRouter.post('/network-strategy', async (req, res) => {
     try {
         const { goal } = req.body;
         if (!goal) return res.status(400).json({ msg: 'Goal required' });
@@ -249,67 +258,52 @@ app.post('/api/network-strategy', auth, async (req, res) => {
         const strategy = await careerIntelligenceService.getNetworkStrategy(req.userId, goal);
         return res.status(200).json(strategy);
     } catch (error) {
-        console.error('Error in network strategy:', error);
+        console.error('Error in network strategy:', error.stack || error);
         return res.status(500).json({ msg: 'Failed to get network strategy', error: error.message });
     }
 });
 
-// 10. Real-Time Market Intelligence
-app.get('/api/market-intelligence', auth, async (req, res) => {
+// 10. Market Intelligence Hub
+apiRouter.get('/market-intelligence', async (req, res) => {
     try {
-        const intelligence = await careerIntelligenceService.getMarketIntelligence(req.userId);
-        return res.status(200).json(intelligence);
+        const insights = await careerIntelligenceService.getMarketIntelligence(req.userId);
+        return res.status(200).json(insights);
     } catch (error) {
-        console.error('Error in market intelligence:', error);
+        console.error('Error in market intelligence:', error.stack || error);
         return res.status(500).json({ msg: 'Failed to get market intelligence', error: error.message });
     }
 });
 
-// 11. Automated Professional Brand Building
-app.post('/api/brand-building', auth, async (req, res) => {
+// 11. Personal Brand Building Assistant
+apiRouter.post('/brand-building', async (req, res) => {
     try {
-        const { focusArea } = req.body;
-        if (!focusArea) return res.status(400).json({ msg: 'Focus area required' });
+        const { query } = req.body;
+        if (!query) return res.status(400).json({ msg: 'Query required' });
 
-        const strategy = await careerIntelligenceService.getBrandBuildingStrategy(req.userId, focusArea);
-        return res.status(200).json(strategy);
+        const brandBuildingContent = await careerIntelligenceService.getBrandBuildingContent(req.userId, query);
+        return res.status(200).json(brandBuildingContent);
     } catch (error) {
-        console.error('Error in brand building:', error);
-        return res.status(500).json({ msg: 'Failed to generate brand building strategy', error: error.message });
+        console.error('Error in personal brand building:', error.stack || error);
+        return res.status(500).json({ msg: 'Failed to get personal brand building content', error: error.message });
     }
 });
 
-// 12. Morning Career Briefing
-app.get('/api/morning-briefing', auth, async (req, res) => {
-    try {
-        const briefing = await careerIntelligenceService.getMorningBriefing(req.userId);
-        return res.status(200).json(briefing);
-    } catch (error) {
-        console.error('Error in morning briefing:', error);
-        return res.status(500).json({ msg: 'Failed to get morning briefing', error: error.message });
-    }
-});
+// Apply the apiRouter to the /api base path
+console.log('index.js: Attempting to mount apiRouter to /api');
+app.use('/api', apiRouter);
 
-// Scrape the logged-in user's LinkedIn profile (manual login flow)
-app.post('/scrape-profile', auth, async (req, res) => {
-  try {
-    console.log(`[SCRAPE-PROFILE] POST /scrape-profile for userId="${req.userId}" (manual login flow)`);
-    const scraper = new LinkedInScraper();
-    const profile = await scraper.scrapeAndSaveProfile(req.userId);
-    console.log(`[SCRAPE-PROFILE] Success for userId="${req.userId}"`);
-    return res.status(200).json({ scrapedData: profile.rawData });
-  } catch (error) {
-    console.error(`[SCRAPE-PROFILE] Error scraping for userId="${req.userId}":`, error.stack || error);
-    return res.status(500).json({ error: 'Failed to scrape profile', details: error.message });
-  }
-});
-
+// Generic 404 handler
 app.use((req, res) => {
+  console.log(`index.js: 404: Endpoint not found for path: ${req.originalUrl}`);
   res.status(404).json({ msg: 'Endpoint not found' });
 });
 
+// Global error handler
 app.use((err, req, res, next) => {
-  console.error('[GLOBAL ERROR HANDLER]', err.stack || err);
+  console.error('[GLOBAL ERROR HANDLER] An error occurred:', err); // Log the actual error object
+  if (err.stack) {
+    console.error('[GLOBAL ERROR HANDLER] Stack trace:', err.stack);
+  }
   res.status(500).json({ msg: 'Internal server error' });
 });
 
