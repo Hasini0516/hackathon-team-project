@@ -52,9 +52,8 @@ apiRouter.post('/register', async (req, res) => {
             skills
         });
         await user.save();
-        
-        const token = jwt.sign({ userId: user._id }, config.jwtSecret);
-        res.status(201).json({ token });
+
+        res.status(201).json({ message:"User created successfully" });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(400).json({ error: error.message });
@@ -78,7 +77,7 @@ apiRouter.post('/login', async (req, res) => {
 });
 
 // Temporary test endpoint
-apiRouter.get('/test', (req, res) => {
+app.get('/test', (req, res) => {
   console.log('apiRouter: /test endpoint hit.');
   res.json({ message: 'Test endpoint reached successfully!' });
 });
