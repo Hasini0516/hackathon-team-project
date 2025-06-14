@@ -30,7 +30,7 @@ const apiRouter = express.Router();
 console.log('index.js: apiRouter created.');
 
 // Unprotected routes
-apiRouter.get('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send('API is live 🎉');
 });
 
