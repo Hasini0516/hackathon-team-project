@@ -30,6 +30,10 @@ const apiRouter = express.Router();
 console.log('index.js: apiRouter created.');
 
 // Unprotected routes
+apiRouter.get('/', (req, res) => {
+  res.send('API is live 🎉');
+});
+
 apiRouter.post('/register', async (req, res) => {
     try {
         const { email, password, name, linkedinUrl, careerGoals, skills } = req.body;
