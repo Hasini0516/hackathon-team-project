@@ -5,7 +5,7 @@ const cors = require('cors');
 const connectDB = require('./utils/db');
 const config = require('./config');
 const auth = require('./middleware/auth');
-const { getLinkedInClient, handleChatRequest, handleLinkedInProfileRequest } = require('./api');
+const {  handleChatRequest, handleLinkedInProfileRequest } = require('./api');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
@@ -31,43 +31,18 @@ connectDB();
 const apiRouter = express.Router();
 console.log('index.js: apiRouter created.');
 
-// Unprotected routes
 app.get('/', (req, res) => {
   res.send('API is live 🎉');
 });
 
-apiRouter.post('/register', async (req, res) => {
-    try {
-        const { email, password, name, linkedinUrl, careerGoals, skills } = req.body;
-        
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email already registered' });
-        }
-
-        const user = new User({
-            email,
-            password,
-            name,
-            linkedinUrl,
-            careerGoals,
-            skills
-        });
-        await user.save();
-
-        res.status(201).json({ message:"User created successfully" });
-    } catch (error) {
-        console.error('Registration error:', error);
-        res.status(400).json({ error: error.message });
-    }
-});
 
 apiRouter.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        
-        if (!user || !(await user.comparePassword(password))) {
+        console.log(user.password);
+        console.log(password);
+        if (!user || !(user.password=== password)) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
         
