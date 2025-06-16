@@ -13,6 +13,8 @@ const adviceQueue = require('./adviceQueue');
 const User = require('./models/User');
 const Conversation = require('./models/Conversation');
 const { addScrapeJob, getJobStatus } = require('./memoryQueue');
+const { getCareerAdvice } = require('./services/hfService');
+const { getJobs } = require('./services/jobService');
 const careerIntelligenceService = require('./services/careerIntelligenceService');
 const LinkedInScraper = require('./scraper');
 
@@ -107,6 +109,29 @@ apiRouter.post('/scrape', async (req, res) => {
     }
 });
 
+
+apiRouter.get('/jobs', async (req, res) => {
+  // expect query params: title and location
+  const { title, location } = req.query;
+  if (!title || !location) {
+    return res.status(400).json({ msg: 'title and location query params required' });
+  }
+  try {
+    const jobs = await getJobs(title, location);
+    // you can limit or format the response
+    const top5 = jobs.slice(0, 5).map(job => ({
+      title: job.job_title,
+      employer: job.employer_name,
+      location: `${job.job_city}, ${job.job_country}`,
+      link: job.job_apply_link
+    }));
+    return res.status(200).json({ jobs: top5 });
+  } catch (err) {
+    console.error('[JOBS] Error:', err);
+    return res.status(500).json({ msg: 'Failed to fetch jobs' });
+  }
+});
+
 // 3a. Scrape Status
 apiRouter.get('/scrape/status/:taskId', async (req, res) => {
   const { taskId } = req.params;
@@ -161,6 +186,19 @@ apiRouter.get('/advice/status/:taskId', async (req, res) => {
   }
 
   return res.status(500).json({ status: 'failure', error: statusObj.error });
+});
+
+
+apiRouter.post('/career-advisor', async (req, res) => {
+  const { question } = req.body;
+  if (!question) return res.status(400).json({ msg: 'Question required' });
+  try {
+    const advice = await getCareerAdvice(question);
+    return res.status(200).json({ advice });
+  } catch (err) {
+    console.error('[CAREER-ADVISOR] Error:', err);
+    return res.status(500).json({ msg: 'Failed to get advice' });
+  }
 });
 
 // post conversation

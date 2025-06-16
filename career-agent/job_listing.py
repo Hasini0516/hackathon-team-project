@@ -10,7 +10,7 @@ def get_jobs(job_title, location):
     }
 
     headers = {
-        "X-RapidAPI-Key": "e0f0d900e6msh27031951b7d4855p1436cajsnc918765ff7da",  # Replace with your key
+        "X-RapidAPI-Key": "65ca83a404msh4027228bfe9e2f1p1dd46cjsn9ab9c8062f1b",  # Replace with your key
         "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
     }
 
