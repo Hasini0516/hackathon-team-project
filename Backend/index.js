@@ -77,7 +77,7 @@ apiRouter.post('/login', async (req, res) => {
 });
 
 // Temporary test endpoint
-app.get('/test', (req, res) => {
+apiRouter.get('/test', (req, res) => {
   console.log('apiRouter: /test endpoint hit.');
   res.json({ message: 'Test endpoint reached successfully!' });
 });
