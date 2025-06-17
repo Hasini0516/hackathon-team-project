@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 const careerIntelligenceService = require('./services/careerIntelligenceService');
 const jobService = require('./services/jobService');
+const hfService = require('./services/hfService');
 
 const app = express();
 
@@ -102,6 +103,21 @@ apiRouter.get('/job-listings', async (req, res) => {
         const jobs = await jobService.getJobs(title, location);
         res.status(200).json({ jobs });
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Career Advice Endpoint
+apiRouter.post('/career-advice', async (req, res) => {
+    try {
+        const { question } = req.body;
+        if (!question) {
+            return res.status(400).json({ error: 'Question is required' });
+        }
+        const advice = await hfService.getCareerAdvice(question);
+        res.json({ advice });
+    } catch (error) {
+        console.error('Error in career advice:', error);
         res.status(500).json({ error: error.message });
     }
 });
