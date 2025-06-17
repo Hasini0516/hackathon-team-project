@@ -1,12 +1,77 @@
-const { getLinkedInClient } = require('../api');
 const User = require('../models/User');
 const Conversation = require('../models/Conversation');
 const CareerIntelligence = require('../models/CareerIntelligence');
 const MarketData = require('../models/MarketData');
 
 class CareerIntelligenceService {
-    constructor() {
-        this.linkedinClient = getLinkedInClient();
+    // Morning Career Briefing
+    async getMorningBriefing(userId) {
+        try {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            // Generate personalized morning briefing
+            const briefing = {
+                date: new Date().toISOString(),
+                greeting: `Good morning, ${user.fullName}!`,
+                careerInsights: [
+                    {
+                        title: "Career Growth Tip",
+                        content: "Focus on developing both technical and soft skills to stay competitive in the job market."
+                    },
+                    {
+                        title: "Industry Trend",
+                        content: "Remote work and hybrid models are becoming increasingly common across industries."
+                    }
+                ],
+                recommendedActions: [
+                    "Update your professional profile",
+                    "Connect with industry leaders",
+                    "Review and update your skills"
+                ]
+            };
+
+            return briefing;
+        } catch (error) {
+            console.error('Error in getMorningBriefing:', error);
+            throw error;
+        }
+    }
+
+    // Predictive Career Pathway Intelligence
+    async getCareerPathways(userId) {
+        try {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            // Generate career pathways based on user's profile
+            const pathways = {
+                currentRole: user.headline || "Professional",
+                potentialPathways: [
+                    {
+                        title: "Technical Leadership",
+                        description: "Progress into technical leadership roles",
+                        requiredSkills: ["Technical expertise", "Leadership", "Project management"],
+                        timeline: "2-3 years"
+                    },
+                    {
+                        title: "Specialist Track",
+                        description: "Deep dive into technical specialization",
+                        requiredSkills: ["Advanced technical skills", "Research", "Problem-solving"],
+                        timeline: "1-2 years"
+                    }
+                ]
+            };
+
+            return pathways;
+        } catch (error) {
+            console.error('Error in getCareerPathways:', error);
+            throw error;
+        }
     }
 
     // 1. Conversational Career Strategist
@@ -42,46 +107,6 @@ class CareerIntelligenceService {
             return mockResponse;
         } catch (error) {
             throw new Error(`Career strategy error: ${error.message}`);
-        }
-    }
-
-    // 2. Predictive Career Pathway Intelligence
-    async getCareerPathways(userId) {
-        try {
-            const user = await User.findById(userId);
-            return {
-                pathways: [
-                    {
-                        path: "Software Engineer → Product Manager",
-                        probability: "70%",
-                        skillsNeeded: ["Product Roadmapping", "Market Analysis"],
-                        timeToTransition: "12-18 months",
-                        salaryIncrease: "15-25%"
-                    },
-                    {
-                        path: "Software Engineer → Tech Lead",
-                        probability: "85%",
-                        skillsNeeded: ["System Design", "Mentorship"],
-                        timeToTransition: "6-12 months",
-                        salaryIncrease: "20-30%"
-                    }
-                ],
-                skillROI: [
-                    {
-                        skill: "React",
-                        salaryIncrease: "23%",
-                        timeFrame: "6 months",
-                        demandTrend: "Increasing"
-                    }
-                ],
-                marketTiming: {
-                    currentTrend: "Healthtech hiring up 40%",
-                    avoidSectors: ["Fintech (hiring freeze)"],
-                    recommendedSectors: ["Healthtech", "AI/ML"]
-                }
-            };
-        } catch (error) {
-            throw new Error(`Career pathways error: ${error.message}`);
         }
     }
 
@@ -183,50 +208,6 @@ class CareerIntelligenceService {
             };
         } catch (error) {
             throw new Error(`Brand building error: ${error.message}`);
-        }
-    }
-
-    // Morning Career Briefing
-    async getMorningBriefing(userId) {
-        try {
-            return {
-                marketUpdate: {
-                    trend: "Backend engineer demand up 12%",
-                    timing: "Perfect for job search"
-                },
-                actionItems: [
-                    {
-                        action: "Comment on Sarah's post",
-                        context: "She's hiring at Google",
-                        priority: "High"
-                    },
-                    {
-                        action: "Apply to roles",
-                        count: 2,
-                        deadline: "Friday"
-                    },
-                    {
-                        action: "Update headline",
-                        impact: "40% more profile views"
-                    }
-                ],
-                strategicInsights: [
-                    {
-                        trend: "Go experience demand",
-                        increase: "65% more job posts",
-                        recommendation: "Consider learning"
-                    }
-                ],
-                networkingOpportunities: [
-                    {
-                        event: "Tech meetup",
-                        timing: "Tonight",
-                        value: "3 people from target companies"
-                    }
-                ]
-            };
-        } catch (error) {
-            throw new Error(`Morning briefing error: ${error.message}`);
         }
     }
 

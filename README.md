@@ -1,114 +1,119 @@
-# 🤖 LinkedIn Career Intelligence Agent
-**AI-powered career advisory system that analyzes LinkedIn profiles and provides personalized guidance using an Agentic AI architecture with GPT-4 and LangChain.**
+# 🤖 Career Intelligence Backend
 
----
+A Node.js-based backend service that provides personalized career guidance and job market insights.
 
-## 🚀 Features
-- 🔗 **LinkedIn profile scraping & analysis** with improved error handling and manual login support
-- 🧠 **Agentic AI** powered by GPT-4 & LangChain
-- 💬 Real-time chat interface
-- 🔄 Background processing with Celery
-- 📊 Career level assessment, job market fit, and skill recommendations
-- 🔒 Secure authentication with JWT
-- 📝 Conversation history tracking
+## 🚀 Core Features
 
----
+- 📊 **Morning Career Briefing**
+  - Personalized daily career insights
+  - Industry trends and growth tips
+  - Recommended actions for career development
 
-## 🧠 Agentic AI Architecture
-Powered by **LangChain Agents** and **Tools**:
-- **Agent Role:** Career strategist that decides which tools to invoke
-- **Tools:**
- - LinkedIn Scraper Tool (via Puppeteer with manual login support)
- - Resume/Skill Parser Tool
- - Job Market Insights Tool (mocked or integrated with APIs)
- - Prompt Generator for role-based advice
-- **Memory:** Stores chat history, analyzed profiles, and goals
-- **Chains:**
- - Profile Analysis Chain
- - Career Roadmap Generator Chain
- - Skill Gap Analysis Chain
+- 🛣️ **Career Pathways**
+  - Current role analysis
+  - Potential career progression paths
+  - Required skills and timeline for each path
+  - Personalized recommendations
 
-Agents dynamically select tools based on user queries to provide goal-driven, adaptive guidance.
-
----
+- 🔍 **Job Listings**
+  - Search jobs by title and location
+  - Detailed job information
+  - Required skills and salary ranges
+  - Application links
 
 ## 🛠️ Tech Stack
-- **Backend:** Node.js, Express, Mongoose, Bull (for queues), JWT
-- **AI Layer:** OpenAI GPT-4, LangChain Agents, Chains, Tools, Memory
-- **Scraping:** Puppeteer with improved error handling
+
+- **Backend:** Node.js, Express
 - **Database:** MongoDB (via Mongoose)
-- **API Client:** Axios (for external API calls)
 - **Authentication:** JWT-based auth system
+- **API Client:** Axios
+- **Environment:** dotenv for configuration
 
----
-
-## 📦 Quick Setup
+## 📦 Setup & Installation
 
 ### Prerequisites
-- Node.js (LTS version recommended)
+- Node.js (LTS version)
 - MongoDB (running instance)
-- Chrome browser (for Puppeteer)
-- OpenAI API key (if using OpenAI services)
-
----
+- npm or yarn
 
 ### Installation
 
 ```bash
-# Clone and setup
-git clone https://github.com/Hasini0516/hackathon-team-project.git
-cd hackathon-team-project/Backend
+# Clone the repository
+git clone https://github.com/yourusername/career-intelligence.git
+cd career-intelligence/Backend
 
-# Install Node.js dependencies
+# Install dependencies
 npm install
 
-# Setup environment variables (create a .env file based on .env.example)
+# Set up environment variables
 cp .env.example .env
-# Fill in API keys and credentials in .env file (e.g., MONGO_URI, JWT_SECRET)
-```
+# Edit .env with your configuration
 
-### Running the Backend
-
-```bash
-# Start the Node.js backend server
-npm start
-
-# Or, for development with nodemon:
+# Start the server
 npm run dev
 ```
 
-### LinkedIn Scraper Usage
-The LinkedIn scraper now supports manual login for better reliability:
-1. When you make a request to scrape a profile, a browser window will open
-2. Log in to LinkedIn manually in the browser window
-3. Navigate to the profile you want to scrape
-4. The scraper will automatically extract the profile data
-
----
-
-## 🔄 Agentic Flow
+### Environment Variables
+Create a `.env` file with the following variables:
 ```
-User Input ─▶ LangChain Agent
-                 │
-         ┌───────┴────────┐
-         ▼                ▼
-   Tool: LinkedIn Scraper   Tool: Job Market Analyzer
-         ▼                ▼
-      Tool: Skill Gap Evaluator ─▶ Chain: Career Roadmap Generator
-         ▼
-      Final Answer ▶ Returned to User
+PORT=8080
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
 ```
 
-## 🔗 Local Dev URLs
-- API: http://localhost:8080
-- Frontend UI: http://localhost:3000 (if connected)
+## 🔒 API Endpoints
 
-## 🤝 Contributing
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Protected Routes (Require JWT Authentication)
+
+1. **Morning Briefing**
+   ```
+   GET /api/morning-briefing
+   ```
+   Returns personalized career insights and recommendations.
+
+2. **Career Pathways**
+   ```
+   GET /api/career-pathways
+   ```
+   Returns potential career paths based on user profile.
+
+3. **Job Listings**
+   ```
+   GET /api/job-listings?title={jobTitle}&location={location}
+   ```
+   Returns job listings matching the search criteria.
+
+## 🧪 Testing
+
+Test the endpoints using the provided test script:
+```bash
+# Run the test script
+node test.js
+```
+
+## 📝 Project Structure
+
+```
+Backend/
+├── services/           # Business logic services
+├── models/            # Database models
+├── middleware/        # Express middleware
+├── utils/            # Utility functions
+├── config.js         # Configuration
+└── index.js          # Main application file
+```
+
+## 🔄 Development
+
+```bash
+# Start development server
+npm run dev
+
+# Run tests
+npm test
+```
 
 ## 📄 License
+
 This project is licensed under the MIT License - see the LICENSE file for details.

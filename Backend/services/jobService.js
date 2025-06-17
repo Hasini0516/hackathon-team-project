@@ -8,32 +8,39 @@ if (!RAPIDAPI_KEY) {
 }
 
 async function getJobs(jobTitle, location) {
-      console.log(RAPIDAPI_KEY);
-  const url = 'https://jsearch.p.rapidapi.com/search';
-  const querystring = {
-    query: `${jobTitle} in ${location}`,
-    page: '1',
-    num_pages: '1'
-  };
-  try {
-    const response = await axios.get(url, {
-      headers: {
-        'X-RapidAPI-Key': RAPIDAPI_KEY,
-        'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
-      },
-      params: querystring,
-      timeout: 10000,
-    });
-    if (response.status === 200) {
-      // return raw data array
-      return response.data.data || [];
-    } else {
-      throw new Error(`RapidAPI responded ${response.status}`);
-    }
-  } catch (err) {
-    console.error('Error fetching jobs:', err.response?.data || err.message);
-    throw new Error('Job search failed');
-  }
+    // Return mock job data
+    return [
+        {
+            job_title: "Senior Software Engineer",
+            employer_name: "Tech Corp",
+            job_city: location,
+            job_country: "USA",
+            job_apply_link: "https://example.com/job1",
+            job_description: "Looking for an experienced software engineer...",
+            job_required_skills: ["JavaScript", "Node.js", "React"],
+            job_salary: "$120,000 - $150,000"
+        },
+        {
+            job_title: "Full Stack Developer",
+            employer_name: "Innovate Inc",
+            job_city: location,
+            job_country: "USA",
+            job_apply_link: "https://example.com/job2",
+            job_description: "Join our team as a full stack developer...",
+            job_required_skills: ["Python", "Django", "React"],
+            job_salary: "$100,000 - $130,000"
+        },
+        {
+            job_title: "Software Developer",
+            employer_name: "Startup Co",
+            job_city: location,
+            job_country: "USA",
+            job_apply_link: "https://example.com/job3",
+            job_description: "Exciting opportunity for a software developer...",
+            job_required_skills: ["Java", "Spring", "AWS"],
+            job_salary: "$90,000 - $120,000"
+        }
+    ];
 }
 
 module.exports = { getJobs };

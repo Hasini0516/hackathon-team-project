@@ -6,12 +6,12 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  email:{
+  email: {
     type: String,
     required: true,
     unique: true
   },
-  password:{
+  password: {
     type: String,
     required: true
   },
@@ -21,25 +21,21 @@ const userSchema = new mongoose.Schema({
   },
   headline: {
     type: String,
-    required: true
+    default: ''
   },
   location: {
     type: String,
-    required: true
+    default: ''
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   },
   skills: {
-    type: [String],
-    default: []
-  },
-  careerGoals: {
-    type: [String],
-    default: []
-  },
-  preferredRoles: {
-    type: [String],
-    default: []
-  },
-  preferredJobLocations: {
     type: [String],
     default: []
   }
@@ -47,6 +43,10 @@ const userSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-
+// Update the updatedAt timestamp before saving
+userSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
 
 module.exports = mongoose.model('User', userSchema);

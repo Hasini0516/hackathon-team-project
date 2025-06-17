@@ -14,33 +14,37 @@ const marketDataSchema = new mongoose.Schema({
         required: true
     },
     salaryData: {
-        average: Number,
         min: Number,
         max: Number,
-        percentiles: {
-            p25: Number,
-            p50: Number,
-            p75: Number
-        }
+        median: Number
     },
     demandMetrics: {
-        jobPostings: Number,
         growthRate: Number,
-        competitionLevel: Number
+        marketSize: Number,
+        competitionLevel: String
     },
     skillsInDemand: [{
         skill: String,
         demandScore: Number
     }],
     trends: [{
-        trend: String,
+        description: String,
         impact: String,
-        confidence: Number
+        timeframe: String
     }],
-    lastUpdated: {
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
         type: Date,
         default: Date.now
     }
+});
+
+marketDataSchema.pre('save', function(next) {
+    this.updatedAt = new Date();
+    next();
 });
 
 marketDataSchema.index({ industry: 1, jobTitle: 1, location: 1 }, { unique: true });

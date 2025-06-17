@@ -6,11 +6,11 @@ const careerIntelligenceSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    jobTitle: {
+    industry: {
         type: String,
         required: true
     },
-    industry: {
+    jobTitle: {
         type: String,
         required: true
     },
@@ -19,18 +19,9 @@ const careerIntelligenceSchema = new mongoose.Schema({
     }],
     experience: {
         type: Number,
-        required: true
+        default: 0
     },
-    marketDemand: {
-        type: Number,
-        min: 0,
-        max: 100
-    },
-    salaryRange: {
-        min: Number,
-        max: Number
-    },
-    recommendations: [{
+    careerGoals: [{
         type: String
     }],
     createdAt: {
@@ -44,7 +35,7 @@ const careerIntelligenceSchema = new mongoose.Schema({
 });
 
 careerIntelligenceSchema.pre('save', function(next) {
-    this.updatedAt = Date.now();
+    this.updatedAt = new Date();
     next();
 });
 

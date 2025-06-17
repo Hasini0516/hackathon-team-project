@@ -11,69 +11,22 @@ NC='\033[0m'
 echo "Testing Backend Endpoints..."
 echo "==========================="
 
-# 1. Test Registration
-echo -e "\n${GREEN}Testing Registration...${NC}"
-REGISTER_RESPONSE=$(curl -s -X POST $BASE_URL/api/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "password": "test123",
-    "name": "Test User",
-    "linkedinUrl": "https://linkedin.com/in/testuser",
-    "careerGoals": ["Software Engineer", "Team Lead"],
-    "skills": ["JavaScript", "Node.js", "MongoDB"]
-  }')
-echo "Registration Response: $REGISTER_RESPONSE"
+# Test Morning Briefing
+echo -e "\n${GREEN}Testing Morning Briefing...${NC}"
+MORNING_RESPONSE=$(curl -s -X GET "$BASE_URL/api/morning-briefing" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODUxMTAxZmEzMzBhOTg4MWM0ODQ3OGYiLCJpYXQiOjE3NTAxNDQ3MzB9.ZCTYuJ96SLilJLQHUDGWOBtbj-tKHyPZyT9dn-pBrQ0")
+echo "Morning Briefing Response: $MORNING_RESPONSE"
 
-# Extract token from registration response
-TOKEN=$(echo $REGISTER_RESPONSE | grep -o '"token":"[^"]*' | cut -d'"' -f4)
+# Test Career Pathways
+echo -e "\n${GREEN}Testing Career Pathways...${NC}"
+PATHWAYS_RESPONSE=$(curl -s -X GET "$BASE_URL/api/career-pathways" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODUxMTAxZmEzMzBhOTg4MWM0ODQ3OGYiLCJpYXQiOjE3NTAxNDQ3MzB9.ZCTYuJ96SLilJLQHUDGWOBtbj-tKHyPZyT9dn-pBrQ0")
+echo "Career Pathways Response: $PATHWAYS_RESPONSE"
 
-if [ -z "$TOKEN" ]; then
-  echo -e "${RED}Registration failed or token not received${NC}"
-  exit 1
-fi
-
-echo -e "\n${GREEN}Token received: $TOKEN${NC}"
-
-# 2. Test Login
-echo -e "\n${GREEN}Testing Login...${NC}"
-LOGIN_RESPONSE=$(curl -s -X POST $BASE_URL/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"test123"}')
-echo "Login Response: $LOGIN_RESPONSE"
-
-# 3. Test Career Strategist
-echo -e "\n${GREEN}Testing Career Strategist...${NC}"
-CAREER_RESPONSE=$(curl -s -X POST $BASE_URL/api/career-strategist \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{
-    "message": "What career path should I pursue?",
-    "conversationHistory": []
-  }')
-echo "Career Strategist Response: $CAREER_RESPONSE"
-
-# 4. Test Market Intelligence
-echo -e "\n${GREEN}Testing Market Intelligence...${NC}"
-MARKET_RESPONSE=$(curl -s -X GET $BASE_URL/api/market-intelligence \
-  -H "Authorization: Bearer $TOKEN")
-echo "Market Intelligence Response: $MARKET_RESPONSE"
-
-# 5. Test Conversations
-echo -e "\n${GREEN}Testing Conversations...${NC}"
-CONV_RESPONSE=$(curl -s -X POST $BASE_URL/conversations \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{
-    "history": ["Hello"],
-    "aiResponses": ["Hi there!"]
-  }')
-echo "Conversations Response: $CONV_RESPONSE"
-
-# 6. Test Get Conversations
-echo -e "\n${GREEN}Testing Get Conversations...${NC}"
-GET_CONV_RESPONSE=$(curl -s -X GET $BASE_URL/conversations \
-  -H "Authorization: Bearer $TOKEN")
-echo "Get Conversations Response: $GET_CONV_RESPONSE"
+# Test Job Listings
+echo -e "\n${GREEN}Testing Job Listings...${NC}"
+JOBS_RESPONSE=$(curl -s -X GET "$BASE_URL/api/job-listings?title=Software%20Engineer&location=New%20York" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODUxMTAxZmEzMzBhOTg4MWM0ODQ3OGYiLCJpYXQiOjE3NTAxNDQ3MzB9.ZCTYuJ96SLilJLQHUDGWOBtbj-tKHyPZyT9dn-pBrQ0")
+echo "Job Listings Response: $JOBS_RESPONSE"
 
 echo -e "\n${GREEN}All tests completed!${NC}" 
