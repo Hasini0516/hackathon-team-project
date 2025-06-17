@@ -3,10 +3,6 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 def generate_morning_briefing(user_data):
-    """
-    Generates a personalized morning career briefing based on user data.
-    This function simulates an ML model's output using sampled data.
-    """
     user_id = user_data.get('userId', 'unknown')
     full_name = user_data.get('fullName', 'User')
     skills = user_data.get('skills', [])
