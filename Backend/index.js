@@ -93,7 +93,6 @@ apiRouter.get('/career-pathways', async (req, res) => {
     }
 });
 
-// Add job-listings endpoint
 apiRouter.get('/job-listings', async (req, res) => {
     const { title, location } = req.query;
     if (!title || !location) {
@@ -122,20 +121,7 @@ apiRouter.post('/career-advice', async (req, res) => {
     }
 });
 
-apiRouter.post('/get-briefing', async (req, res) => {
-  try {
-    const userData = req.body;
 
-    const flaskResponse = await axios.post('http://localhost:5001/morning-briefing', userData);
-    
-    return res.json(flaskResponse.data);
-  } catch (error) {
-    console.error('Error communicating with Flask service:', error.message);
-    return res.status(500).json({ error: 'Failed to get morning briefing' });
-  }
-});
-
-// Apply the apiRouter to the /api base path
 app.use('/api', apiRouter);
 
 // Generic 404 handler
