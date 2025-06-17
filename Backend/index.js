@@ -12,7 +12,7 @@ const User = require('./models/User');
 const careerIntelligenceService = require('./services/careerIntelligenceService');
 const jobService = require('./services/jobService');
 const hfService = require('./services/hfService');
-
+const axios = require('axios');
 const app = express();
 
 // Middleware
@@ -35,13 +35,11 @@ apiRouter.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        if (!user) {
+        console.log(user.password);
+        if (!user || !(user.password=== password)) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
+        
         const token = jwt.sign({ userId: user._id }, config.jwtSecret);
         res.json({ token });
     } catch (error) {
@@ -75,7 +73,9 @@ apiRouter.get('/test', (req, res) => {
 apiRouter.use(auth);
 
 // Protected Routes
-apiRouter.get('/morning-briefing', async (req, res) => {
+apiRouter.post('/morning-briefing', async (req, res) => {
+    console.log('User ID:', req.userId);
+
     try {
         const briefing = await careerIntelligenceService.getMorningBriefing(req.userId);
         res.json(briefing);
@@ -122,6 +122,19 @@ apiRouter.post('/career-advice', async (req, res) => {
     }
 });
 
+apiRouter.post('/get-briefing', async (req, res) => {
+  try {
+    const userData = req.body;
+
+    const flaskResponse = await axios.post('http://localhost:5001/morning-briefing', userData);
+    
+    return res.json(flaskResponse.data);
+  } catch (error) {
+    console.error('Error communicating with Flask service:', error.message);
+    return res.status(500).json({ error: 'Failed to get morning briefing' });
+  }
+});
+
 // Apply the apiRouter to the /api base path
 app.use('/api', apiRouter);
 
@@ -136,6 +149,7 @@ app.use((err, req, res, next) => {
   console.error('An error occurred:', err);
   res.status(500).json({ msg: 'Internal server error' });
 });
+
 
 // Start server
 const PORT = config.port || 8080;
