@@ -1,119 +1,131 @@
-# 🤖 Career Intelligence Backend
+# 🚀 CareerPro 
 
-A Node.js-based backend service that provides personalized career guidance and job market insights.
+A full-stack platform for personalized career guidance, job market insights, and professional growth powered by Node.js, React, and Python ML.
 
-## 🚀 Core Features
+---
 
-- 📊 **Morning Career Briefing**
-  - Personalized daily career insights
-  - Industry trends and growth tips
-  - Recommended actions for career development
+## 🗂️ Project Structure
 
-- 🛣️ **Career Pathways**
-  - Current role analysis
-  - Potential career progression paths
-  - Required skills and timeline for each path
-  - Personalized recommendations
+```
+hackathon-team-project/
+├── Backend/           # Node.js/Express backend (API, DB, Auth, Integrations)
+├── frontend/          # React + Vite frontend (user interface)
+├── morning_brief/     # Python Flask ML microservice (morning briefing)
+├── career-agent/      # (Optional) Additional Python microservice
+└── README.md          # Main project documentation
+```
 
-- 🔍 **Job Listings**
-  - Search jobs by title and location
-  - Detailed job information
-  - Required skills and salary ranges
-  - Application links
+---
+
+## 🌟 Features
+
+- **User Authentication** (JWT-based)
+- **Personalized Morning Briefing** (ML-powered, Python Flask)
+- **Career Pathways & Insights**
+- **Job Listings** (via RapidAPI)
+- **Career Advice** (via Hugging Face API)
+- **Profile Management**
+- **Modern, Responsive UI** (React + Tailwind)
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Backend:** Node.js, Express
-- **Database:** MongoDB (via Mongoose)
-- **Authentication:** JWT-based auth system
-- **API Client:** Axios
-- **Environment:** dotenv for configuration
+- **Frontend:** React, Vite, Tailwind CSS
+- **Backend:** Node.js, Express, MongoDB (Mongoose), JWT, Axios
+- **ML Service:** Python, Flask
+- **Integrations:** Hugging Face, RapidAPI (Job Search)
+- **Deployment:** GitHub Pages (frontend), Render/Railway/Heroku (backend & Python recommended)
 
-## 📦 Setup & Installation
+---
 
-### Prerequisites
-- Node.js (LTS version)
-- MongoDB (running instance)
-- npm or yarn
+## ⚡ Quick Start
 
-### Installation
-
+### 1. **Clone the Repository**
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/career-intelligence.git
-cd career-intelligence/Backend
+git clone <your-repo-url>
+cd hackathon-team-project
+```
 
-# Install dependencies
+### 2. **Backend Setup**
+```bash
+cd Backend
 npm install
+# Set up .env with:
+# MONGO_URI=your_mongo_uri
+# JWT_SECRET=your_jwt_secret
+# HF_TOKEN=your_huggingface_token
+# RAPIDAPI_KEY=your_rapidapi_key
+npm start
+```
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
+### 3. **Python ML Service Setup**
+```bash
+cd ../morning_brief
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 morning_briefing_model.py
+```
 
-# Start the server
+### 4. **Frontend Setup**
+```bash
+cd ../frontend
+npm install
 npm run dev
 ```
+Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
-### Environment Variables
-Create a `.env` file with the following variables:
-```
-PORT=8080
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-```
-
-## 🔒 API Endpoints
-
-### Protected Routes (Require JWT Authentication)
-
-1. **Morning Briefing**
-   ```
-   GET /api/morning-briefing
-   ```
-   Returns personalized career insights and recommendations.
-
-2. **Career Pathways**
-   ```
-   GET /api/career-pathways
-   ```
-   Returns potential career paths based on user profile.
-
-3. **Job Listings**
-   ```
-   GET /api/job-listings?title={jobTitle}&location={location}
-   ```
-   Returns job listings matching the search criteria.
+---
 
 ## 🧪 Testing
 
-Test the endpoints using the provided test script:
-```bash
-# Run the test script
-node test.js
+- **Backend:**  
+  ```bash
+  cd Backend
+  node test.js
+  ```
+- **Frontend:**  
+  Manual testing via browser.
+
+---
+
+## 🔑 Environment Variables
+
+**Backend (`Backend/.env`):**
+```
+MONGO_URI=your_mongo_uri
+JWT_SECRET=your_jwt_secret
+HF_TOKEN=your_huggingface_token
+RAPIDAPI_KEY=your_rapidapi_key
 ```
 
-## 📝 Project Structure
+**Python ML Service (`morning_brief/.env` if needed):**
+- Add any required tokens/keys for your ML model.
 
-```
-Backend/
-├── services/           # Business logic services
-├── models/            # Database models
-├── middleware/        # Express middleware
-├── utils/            # Utility functions
-├── config.js         # Configuration
-└── index.js          # Main application file
-```
+---
 
-## 🔄 Development
+## 📝 Deployment
 
-```bash
-# Start development server
-npm run dev
+- **Frontend:** Deploy `frontend` to GitHub Pages, Vercel, or Netlify.
+- **Backend & Python:** Deploy to Render, Railway, Heroku, or your own server.
+- **Update API URLs** in the frontend to point to your deployed backend.
 
-# Run tests
-npm test
-```
+---
+
+## 📁 Directory Details
+
+- **Backend/**: Node.js API, MongoDB models, JWT auth, integrations.
+- **frontend/**: React app, routes, components, API calls.
+- **morning_brief/**: Python Flask app for ML-powered morning briefings.
+- **career-agent/**: (Optional) Additional Python microservice.
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
+
+---
+
+**Feel free to use this as your main README!**
