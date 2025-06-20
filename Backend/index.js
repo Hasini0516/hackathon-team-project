@@ -35,12 +35,11 @@ apiRouter.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        console.log(user.password);
-        if (!user || !(user.password=== password)) {
+        if (!user || !(user.password === password)) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
-        
-        const token = jwt.sign({ userId: user._id }, config.jwtSecret);
+        // SIGN JWT WITH userId (not _id)
+        const token = jwt.sign({ userId: user.userId }, config.jwtSecret);
         res.json({ token });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -57,7 +56,8 @@ apiRouter.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ userId, email, password: hashedPassword, fullName, headline, location });
         await newUser.save();
-        const token = jwt.sign({ userId: newUser._id }, config.jwtSecret);
+        // SIGN JWT WITH userId (not _id)
+        const token = jwt.sign({ userId: newUser.userId }, config.jwtSecret);
         res.status(201).json({ token });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -83,6 +83,29 @@ apiRouter.post('/morning-briefing', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user; 
+    next();
+  });
+}
+apiRouter.get('/profile', authenticateToken, async (req, res) => {
+  try {
+    console.log('Fetching profile for userId:', req.user.userId);
+    const user = await User.findOne({ userId: req.user.userId }).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 apiRouter.get('/career-pathways', async (req, res) => {
     try {
@@ -114,12 +137,13 @@ apiRouter.post('/career-advice', async (req, res) => {
             return res.status(400).json({ error: 'Question is required' });
         }
         const advice = await hfService.getCareerAdvice(question);
-        res.json({ advice });
+        res.json({ advice }); // same
     } catch (error) {
         console.error('Error in career advice:', error);
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 app.use('/api', apiRouter);

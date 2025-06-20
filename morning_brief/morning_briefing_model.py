@@ -34,7 +34,7 @@ def generate_morning_briefing(user_data):
         networking_opportunities.append({"event": f"Local tech meetup in {location}", "timing": "Tonight", "value": "Expand your local connections"})
 
     return {
-        "greeting": f"Good morning, {full_name}! Here's your career intelligence for today:",
+        "greeting": f"Hey, {full_name}! Here's your career intelligence for today:",
         "marketUpdate": market_update,
         "actionItems": action_items,
         "strategicInsights": strategic_insights,

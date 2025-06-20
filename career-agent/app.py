@@ -2,7 +2,7 @@ from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # Load variables from .env
+load_dotenv()  
 
 token = os.getenv("HF_TOKEN")
 
@@ -13,10 +13,8 @@ client = InferenceClient(
 )
 
 def career_advisor(question):
-    # List of keywords to decide if it's a roadmap question
     roadmap_keywords = ["career", "path", "become", "field", "developer", "engineer", "data", "learn", "AI", "switch", "job", "intern", "roadmap"]
 
-    # Check if question is specific enough to follow roadmap format
     is_specific = any(word.lower() in question.lower() for word in roadmap_keywords)
 
     if is_specific:

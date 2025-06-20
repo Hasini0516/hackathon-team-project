@@ -7,7 +7,7 @@ class CareerIntelligenceService {
     // Morning Career Briefing
     async getMorningBriefing(userId) {
         try {
-            const user = await User.findById(userId);
+            const user = await User.findOne({userId});
             if (!user) {
                 throw new Error('User not found');
             }
@@ -43,7 +43,7 @@ class CareerIntelligenceService {
     // Predictive Career Pathway Intelligence
     async getCareerPathways(userId) {
         try {
-            const user = await User.findById(userId);
+            const user = await User.findOne({userId});
             if (!user) {
                 throw new Error('User not found');
             }
