@@ -23,8 +23,7 @@ async function callHuggingFace(prompt) {
         timeout: 120000, // adjust as needed
       }
     );
-    // HF returns an array of generated outputs or sometimes a different structure.
-    // Often: response.data is like [{generated_text: "..."}]
+    
     if (Array.isArray(response.data) && response.data.length > 0) {
       return response.data[0].generated_text;
     }
@@ -73,7 +72,13 @@ Please answer in this format:
 async function getCareerAdvice(question) {
   const prompt = buildPrompt(question);
   const text = await callHuggingFace(prompt);
-  return text;
+
+  const assistantTag = '<|assistant|>';
+  let response = text;
+  if (text.includes(assistantTag)) {
+    response = text.split(assistantTag).pop().trim();
+  }
+  return response;
 }
 
 module.exports = { getCareerAdvice };

@@ -5,7 +5,8 @@ import os
 load_dotenv()  
 
 token = os.getenv("HF_TOKEN")
-
+print("Token from .env:", token)
+print("Token from environment:", os.environ.get("HF_TOKEN"))
 
 client = InferenceClient(
     model="HuggingFaceH4/zephyr-7b-beta",
