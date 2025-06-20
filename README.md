@@ -35,7 +35,6 @@ hackathon-team-project/
 - **Backend:** Node.js, Express, MongoDB (Mongoose), JWT, Axios
 - **ML Service:** Python, Flask
 - **Integrations:** Hugging Face, RapidAPI (Job Search)
-- **Deployment:** GitHub Pages (frontend), Render/Railway/Heroku (backend & Python recommended)
 
 ---
 
@@ -110,7 +109,7 @@ RAPIDAPI_KEY=your_rapidapi_key
 - **Backend/**: Node.js API, MongoDB models, JWT auth, integrations.
 - **frontend/**: React app, routes, components, API calls.
 - **morning_brief/**: Python Flask app for ML-powered morning briefings.
-- **career-agent/**: (Optional) Additional Python microservice.
+- **career-agent/**: Additional Python microservice.
 
 ---
 
