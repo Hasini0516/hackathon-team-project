@@ -105,14 +105,6 @@ RAPIDAPI_KEY=your_rapidapi_key
 
 ---
 
-## 📝 Deployment
-
-- **Frontend:** Deploy `frontend` to GitHub Pages, Vercel, or Netlify.
-- **Backend & Python:** Deploy to Render, Railway, Heroku, or your own server.
-- **Update API URLs** in the frontend to point to your deployed backend.
-
----
-
 ## 📁 Directory Details
 
 - **Backend/**: Node.js API, MongoDB models, JWT auth, integrations.
@@ -126,6 +118,4 @@ RAPIDAPI_KEY=your_rapidapi_key
 
 This project is licensed under the MIT License.
 
----
 
-**Feel free to use this as your main README!**
